@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactCardFlip from 'react-card-flip';
+import { useSwipeable } from 'react-swipeable';
 
 const Quiz = () => {
   const [flashcards, setFlashcards] = useState([]);
@@ -27,16 +28,43 @@ const Quiz = () => {
   };
 
   const nextQuestion = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % flashcards.length);
+    if (currentIndex < flashcards.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      setCurrentIndex(0); // Loop back to the first question if at the end
+    }
     setSelectedOption('');
     setResult(null);
     setIsFlipped(false);
   };
 
+  const prevQuestion = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    } else {
+      setCurrentIndex(flashcards.length - 1); // Loop to the last question if at the beginning
+    }
+    setSelectedOption('');
+    setResult(null);
+    setIsFlipped(false);
+  };
+
+  const handleSwipe = () => {
+    submitAnswer();
+  };
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => nextQuestion(),
+    onSwipedRight: () => prevQuestion(),
+    onSwipedUp: () => handleSwipe(),
+    onSwipedDown: () => handleSwipe(),
+    trackMouse: true
+  });
+
   if (flashcards.length === 0) return <p className="text-center mt-10 text-gray-600">Loading...</p>;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray-900">
+    <div {...handlers} className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray-900">
       <ReactCardFlip isFlipped={isFlipped} flipDirection="horizontal">
         {/* Front of the card */}
         <div className="bg-white rounded-lg shadow-lg p-8 mx-auto max-w-2xl">
@@ -61,12 +89,24 @@ const Quiz = () => {
               ))}
             </div>
           </div>
-          <div className="mt-8 flex justify-end space-x-4">
+          <div className="mt-8 flex justify-between space-x-4">
+            <button
+              onClick={prevQuestion}
+              className="px-6 py-3 bg-gray-600 text-white rounded-lg shadow hover:bg-gray-700 transition"
+            >
+              Previous
+            </button>
             <button
               onClick={submitAnswer}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
             >
               Submit Answer
+            </button>
+            <button
+              onClick={nextQuestion}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+            >
+              Next
             </button>
           </div>
         </div>
@@ -78,12 +118,18 @@ const Quiz = () => {
               {result === true ? 'Correct!' : `Incorrect! The correct answer is: ${flashcards[currentIndex].answer}`}
             </p>
           </div>
-          <div className="mt-8 flex justify-end space-x-4">
+          <div className="mt-8 flex justify-between space-x-4">
+            <button
+              onClick={prevQuestion}
+              className="px-6 py-3 bg-gray-600 text-white rounded-lg shadow hover:bg-gray-700 transition"
+            >
+              Previous
+            </button>
             <button
               onClick={nextQuestion}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
             >
-              Next Question
+              Next
             </button>
           </div>
         </div>
