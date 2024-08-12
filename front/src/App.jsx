@@ -4,7 +4,6 @@ import Admin from './admin';
 import Quiz from './Quiz';
 
 function App() {
-  // Custom hook to get the current location
   const location = useLocation();
 
   return (
