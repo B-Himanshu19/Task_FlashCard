@@ -42,7 +42,7 @@ const Quiz = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     } else {
-      setCurrentIndex(flashcards.length - 1); // Loop to the last question if at the beginning
+      setCurrentIndex(flashcards.length - 1);
     }
     setSelectedOption('');
     setResult(null);
